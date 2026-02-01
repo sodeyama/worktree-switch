@@ -1,6 +1,8 @@
 # worktree-switch
 
-A zsh function to interactively select and switch between Git worktrees using fzf.
+A zsh plugin for interactive Git worktree management using fzf.
+
+![Demo](demo.gif)
 
 ## Features
 
