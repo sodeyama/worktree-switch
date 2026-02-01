@@ -10,6 +10,9 @@
 : ${WT_LOG_COUNT:=5}
 : ${WT_BASE_DIR:=..}
 
+# Store script path for fzf preview
+WT_SCRIPT_PATH="${0:A}"
+
 # Helper: Check if inside a Git repository
 _wt_check_git() {
   if ! git rev-parse --is-inside-work-tree &>/dev/null; then
@@ -33,6 +36,28 @@ _wt_get_worktrees() {
   git worktree list
 }
 
+# Helper: Generate preview for a worktree line
+_wt_preview() {
+  local line="$1"
+  local log_count="$2"
+  local path="${line%% *}"
+  local branch="${line##*\[}"
+  branch="${branch%\]}"
+
+  # Find git command
+  local git_cmd
+  git_cmd=$(command -v git 2>/dev/null || echo "/usr/bin/git")
+
+  echo "Path: $path"
+  echo "Branch: $branch"
+  echo ""
+  echo "--- Recent Commits ---"
+  "$git_cmd" -C "$path" log --oneline -"$log_count" 2>/dev/null
+  echo ""
+  echo "--- Last Commit ---"
+  "$git_cmd" -C "$path" log -1 --format="Author: %an <%ae>%nDate:   %ad%n%n%s%n%n%b" --date=short 2>/dev/null
+}
+
 # Helper: Select worktree with fzf
 _wt_select_worktree() {
   local header="${1:-Select a worktree (ESC to cancel)}"
@@ -44,11 +69,15 @@ _wt_select_worktree() {
     return 1
   fi
 
+  # Export variables for fzf preview subprocess
+  export WT_LOG_COUNT
+  export WT_SCRIPT_PATH
+
   echo "$worktrees" | fzf \
     --height="${WT_FZF_HEIGHT}" \
     --reverse \
     --header="$header" \
-    --preview="echo 'Path: \$(echo {} | awk \"{print \\\$1}\")' && echo 'Branch: \$(echo {} | awk \"{print \\\$3}\" | tr -d \"[]\")' && echo '' && git -C \$(echo {} | awk \"{print \\\$1}\") log --oneline -${WT_LOG_COUNT} 2>/dev/null" \
+    --preview="PATH=\"$PATH\" zsh -c 'source \"$WT_SCRIPT_PATH\"; _wt_preview \"\$1\" $WT_LOG_COUNT' -- {}" \
     --preview-window="${WT_FZF_PREVIEW_POSITION}"
 }
 

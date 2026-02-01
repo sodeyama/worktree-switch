@@ -4,13 +4,17 @@
 # Configuration
 Output demo.gif
 Set FontSize 16
-Set Width 900
-Set Height 550
+Set Width 1000
+Set Height 600
 Set Theme "Catppuccin Mocha"
 Set Padding 20
+Set Shell "zsh"
 
-# Setup - source the plugin
+# Setup - source zshrc and the plugin
 Hide
+Type "source ~/.zshrc"
+Enter
+Sleep 1s
 Type "source wt.zsh"
 Enter
 Sleep 500ms
@@ -22,17 +26,6 @@ Sleep 1s
 Enter
 Sleep 500ms
 
-# Create new worktrees using wt new
-Type "wt new feature/awesome"
-Sleep 500ms
-Enter
-Sleep 2s
-
-Type "wt new bugfix/hotfix"
-Sleep 500ms
-Enter
-Sleep 2s
-
 # Show worktree list
 Type "git worktree list"
 Sleep 500ms
@@ -43,15 +36,15 @@ Sleep 2s
 Type "wt"
 Sleep 500ms
 Enter
-Sleep 1.5s
+Sleep 2s
 
-# Navigate with arrow keys in fzf
+# Navigate with arrow keys in fzf to show different previews
 Down
-Sleep 600ms
+Sleep 1.5s
+Down
+Sleep 1.5s
 Up
-Sleep 600ms
-Up
-Sleep 600ms
+Sleep 1.5s
 
 # Select with Enter
 Enter
